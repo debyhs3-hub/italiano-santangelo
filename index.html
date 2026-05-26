@@ -842,11 +842,12 @@ const AV_COLORS=[['#EEEDFE','#3C3489'],['#E1F5EE','#085041'],['#FAECE7','#712B13
 function renderTablero(){
   const us=loadUsers();
   let jug=us.map(n=>{const d=loadU(n)||{nombre:n,nivel:'Básico',pts:0};return d}).sort((a,b)=>b.pts-a.pts);
-  if(jug.length<3){
-    const demo=[{nombre:'Gastón R.',nivel:'Intermedio',pts:410},{nombre:'Valeria M.',nivel:'Avanzado',pts:385},{nombre:'Diego F.',nivel:'Básico',pts:290},{nombre:'Lucía P.',nivel:'Intermedio',pts:240},{nombre:'Martín C.',nivel:'Básico',pts:180}];
-    const existentes=jug.map(j=>j.nombre);
-    demo.forEach(d=>{if(!existentes.includes(d.nombre))jug.push(d)});
-    jug.sort((a,b)=>b.pts-a.pts);
+  if(jug.length===0){
+    document.getElementById('podium').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--ink2);opacity:.5;font-size:14px">Todavía no hay jugadores registrados.<br>¡Sé el primero en entrar!</div>';
+    document.getElementById('player-list').innerHTML='';
+    document.getElementById('st-jug').textContent='0';
+    document.getElementById('st-pos').textContent='—';
+    return;
   }
   document.getElementById('st-jug').textContent=jug.length;
   const miPos=jug.findIndex(j=>j.nombre===usuario.nombre);
