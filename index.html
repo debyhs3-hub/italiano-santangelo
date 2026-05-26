@@ -945,8 +945,20 @@ function toast(msg){
   t._t=setTimeout(()=>t.classList.remove('on'),2800);
 }
 
+// ============ LIMPIAR DATOS DEMO VIEJOS ============
+function limpiarDemo(){
+  const demo=['Gastón R.','Valeria M.','Diego F.','Lucía P.','Martín C.'];
+  let us=loadUsers();
+  const limpios=us.filter(n=>!demo.includes(n));
+  if(limpios.length!==us.length){
+    saveUsers(limpios);
+    demo.forEach(n=>localStorage.removeItem('ita_u_'+n));
+  }
+}
+
 // ============ INIT ============
 function init(){
+  limpiarDemo();
   renderLeccion();
   renderTemas(); renderGrid();
   renderEj(); renderEjBanco();
