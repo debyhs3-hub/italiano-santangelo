@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Italiani di Sant'Angelo · Desafío Mensual</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F5F0E8;--parchment:#EDE5D0;--ink:#1A1208;--ink2:#3D2E14;
+  --terra:#C4502A;--terra2:#E8724A;--terra3:#F5DDD4;
+  --gold:#C8952A;--gold2:#F0C060;--gold3:#FBF0D8;
+  --sage:#5A7A5A;--sage2:#E0EAD8;
+  --b:rgba(26,18,8,.15);--b2:rgba(26,18,8,.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+.sf{font-family:'Playfair Display',serif}
+
+/* TOPBAR */
+.topbar{background:var(--ink);color:#fff;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;position:sticky;top:0;z-index:100}
+.topbar-brand{font-family:'Playfair Display',serif;font-size:16px}
+.topbar-brand em{color:var(--gold2);font-style:italic}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.pts-badge{background:var(--gold);color:var(--ink);padding:3px 11px;border-radius:20px;font-size:12px;font-weight:500}
+.av{width:32px;height:32px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;cursor:pointer}
+
+/* REGISTRO MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(26,18,8,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:#fff;border-radius:14px;padding:2rem;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h2{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:.25rem}
+.modal-sub{font-size:13px;color:var(--ink2);opacity:.7;margin-bottom:1.5rem;line-height:1.5}
+.modal label{display:block;font-size:11px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:var(--ink2);margin-bottom:5px}
+.modal input,.modal select{width:100%;padding:11px 14px;border:1px solid var(--b2);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);margin-bottom:1rem;outline:none}
+.modal input:focus,.modal select:focus{border-color:var(--terra)}
+.btn-reg{width:100%;padding:13px;background:var(--terra);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-reg:hover{background:var(--terra2)}
+.btn-skip{width:100%;margin-top:10px;padding:11px;background:transparent;color:var(--ink2);border:1px solid var(--b2);border-radius:8px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.hidden{display:none!important}
+
+/* NAV */
+.nav{display:flex;background:#fff;border-bottom:1px solid var(--b);overflow-x:auto;scrollbar-width:none;position:sticky;top:54px;z-index:99}
+.nav::-webkit-scrollbar{display:none}
+.nb{padding:13px 16px;font-size:13px;font-weight:500;border:none;background:none;cursor:pointer;color:var(--ink2);opacity:.55;white-space:nowrap;font-family:'DM Sans',sans-serif;border-bottom:2px solid transparent;transition:all .2s}
+.nb.on{opacity:1;color:var(--terra);border-bottom-color:var(--terra)}
+
+/* CONTENT */
+.wrap{max-width:680px;margin:0 auto;padding:1.25rem 1rem 4rem}
+
+/* SECTION PAGES */
+.page{display:none}.page.on{display:block}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--b);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
+.ctitle{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:.2rem}
+.csub{font-size:13px;color:var(--ink2);opacity:.65;margin-bottom:1rem}
+
+/* NIVEL PILLS */
+.pills{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap}
+.pill{padding:7px 18px;border-radius:20px;border:1px solid var(--b2);background:#fff;color:var(--ink2);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.pill.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* LESSON */
+.lrule{background:var(--parchment);border-radius:8px;padding:.9rem 1.1rem;margin-bottom:.7rem;border-left:3px solid var(--terra)}
+.lrtitle{font-size:12px;font-weight:500;letter-spacing:.6px;text-transform:uppercase;color:var(--terra);margin-bottom:.5rem}
+.lrrow{display:flex;gap:8px;align-items:baseline;padding:3px 0;font-size:14px}
+.lrit{font-style:italic;font-weight:500;min-width:160px;color:var(--ink)}
+.lres{color:var(--ink2);opacity:.75}
+
+/* WORDS */
+.trow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.tbtn{padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid var(--b);background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink2);transition:all .15s}
+.tbtn.on{background:var(--terra);color:#fff;border-color:var(--terra)}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin-bottom:1rem}
+.wcard{border:1px solid var(--b);border-radius:10px;padding:.9rem;text-align:center;cursor:pointer;transition:all .15s;position:relative}
+.wcard:hover{border-color:var(--terra);transform:translateY(-1px)}
+.wcard.learned{border-color:var(--sage);background:var(--sage2)}
+.wit{font-family:'Playfair Display',serif;font-size:20px;font-style:italic;margin-bottom:3px}
+.wes{font-size:12px;color:var(--ink2);margin-bottom:3px}
+.wpron{font-size:11px;color:var(--terra);opacity:.8}
+.wcheck{position:absolute;top:6px;right:8px;font-size:14px;display:none}
+.wcard.learned .wcheck{display:block}
+
+/* EXERCISES */
+.racha-strip{display:flex;gap:5px;margin-bottom:1.25rem;flex-wrap:wrap}
+.rday{width:38px;height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:500;border:1px solid var(--b);background:#fff;color:var(--ink2);opacity:.45}
+.rday.done{background:var(--terra);color:#fff;border-color:var(--terra);opacity:1}
+.rday.hoy{border-color:var(--terra);color:var(--terra);opacity:1;font-weight:700}
+.rday span{font-size:15px;line-height:1}
+.ej-tipo{font-size:11px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:var(--terra)}
+.ej-pts{background:var(--gold3);color:var(--gold);padding:4px 12px;border-radius:20px;font-size:13px;font-weight:500}
+.ej-q{font-size:16px;line-height:1.6;margin:1rem 0}
+.fi{width:100%;padding:11px 14px;border:1px solid var(--b2);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);outline:none;transition:border .2s;margin-bottom:.75rem}
+.fi:focus{border-color:var(--terra)}
+textarea.fi{resize:vertical;min-height:90px}
+.fb{padding:10px 14px;border-radius:8px;font-size:14px;margin-bottom:.75rem;line-height:1.5;display:none}
+.fb.ok{background:var(--sage2);color:var(--sage);display:block}
+.fb.mal{background:var(--terra3);color:var(--terra);display:block}
+.brow{display:flex;gap:8px;flex-wrap:wrap}
+.bp{padding:10px 20px;background:var(--terra);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.bp:hover{background:var(--terra2)}
+.bs{padding:10px 20px;background:transparent;color:var(--ink);border:1px solid var(--b2);border-radius:8px;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.bs:hover{background:var(--parchment)}
+.bai{padding:10px 20px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:6px}
+.bai:hover{opacity:.85}
+.bai:disabled{opacity:.5;cursor:not-allowed}
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;display:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.aibox{background:var(--parchment);border:1px solid var(--b);border-radius:10px;padding:1rem 1.25rem;margin-top:1rem;font-size:14px;line-height:1.75;white-space:pre-wrap;display:none}
+.aibox.on{display:block}
+
+/* PRONUNCIACIÓN */
+.prcard{background:var(--parchment);border-radius:10px;padding:1.1rem 1.25rem;margin-bottom:.7rem;border-left:3px solid var(--gold)}
+.prword{font-family:'Playfair Display',serif;font-size:22px;font-style:italic;margin-bottom:3px}
+.prphon{font-size:13px;color:var(--terra);margin-bottom:.4rem}
+.prrule{font-size:13px;color:var(--ink2);line-height:1.6}
+
+/* TABLERO */
+.th-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+.thcard{background:var(--ink);color:#fff;border-radius:10px;padding:1rem;text-align:center}
+.th-lbl{font-size:11px;opacity:.55;letter-spacing:.5px;margin-bottom:5px}
+.th-val{font-family:'Playfair Display',serif;font-size:26px}
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.pod{background:#fff;border:1px solid var(--b);border-radius:10px;padding:1rem;text-align:center}
+.pod.g1{border-color:var(--gold);background:var(--gold3)}
+.pod.g3{border-color:rgba(196,80,42,.3);background:var(--terra3)}
+.pod-med{font-size:26px;margin-bottom:4px}
+.pod-name{font-size:13px;font-weight:500}
+.pod-pts{font-size:12px;color:var(--ink2);opacity:.65;margin-top:2px}
+.prow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--b)}
+.prow:last-child{border-bottom:none}
+.ppos{font-size:13px;color:var(--ink2);width:22px;text-align:center;font-weight:500}
+.pav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
+.pinfo{flex:1}
+.pname{font-size:14px;font-weight:500}
+.plvl{font-size:11px;color:var(--ink2);opacity:.6}
+.pbar-o{height:4px;background:var(--b);border-radius:2px;margin-top:5px}
+.pbar-i{height:4px;border-radius:2px;background:var(--terra);transition:width .5s}
+.pscore{font-size:15px;font-weight:500;text-align:right}
+.pscore small{display:block;font-size:11px;color:var(--ink2);opacity:.55;font-weight:400}
+.mebadge{font-size:10px;background:var(--terra);color:#fff;padding:2px 6px;border-radius:4px;margin-left:5px}
+
+/* DESAFÍO */
+.dhero{background:var(--ink);color:#fff;border-radius:12px;padding:2rem;margin-bottom:1rem;text-align:center}
+.dhero-title{font-family:'Playfair Display',serif;font-size:24px;font-style:italic;margin-bottom:.4rem}
+.dhero-sub{font-size:13px;opacity:.55;margin-bottom:1.5rem}
+.dhero-num{font-family:'Playfair Display',serif;font-size:52px;color:var(--gold2);line-height:1}
+.dhero-lbl{font-size:12px;opacity:.45;margin-top:4px;margin-bottom:1.5rem}
+.tbar{height:6px;background:rgba(255,255,255,.1);border-radius:3px}
+.tfill{height:6px;background:var(--gold);border-radius:3px}
+.pts-tbl{width:100%;border-collapse:collapse;font-size:14px}
+.pts-tbl th{text-align:left;padding:7px 0;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--ink2);opacity:.55;border-bottom:1px solid var(--b)}
+.pts-tbl td{padding:10px 0;border-bottom:1px solid var(--b)}
+.pts-tbl tr:last-child td{border-bottom:none}
+.pts-v{font-weight:500;color:var(--gold);text-align:right}
+.ritem{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--b)}
+.ritem:last-child{border-bottom:none}
+.rico{font-size:20px;flex-shrink:0}
+.rtitle{font-size:14px;font-weight:500;margin-bottom:2px}
+.rdesc{font-size:13px;color:var(--ink2);opacity:.65;line-height:1.55}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:8px;font-size:14px;font-weight:500;z-index:999;transition:transform .3s;pointer-events:none;white-space:nowrap}
+.toast.on{transform:translateX(-50%) translateY(0)}
+
+/* PROGRESO LECCIÓN */
+.lec-prog{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;font-size:13px;color:var(--ink2)}
+.lec-prog-bar{height:4px;background:var(--b);border-radius:2px;flex:1;margin:0 10px}
+.lec-prog-fill{height:4px;background:var(--terra);border-radius:2px;transition:width .4s}
+
+@media(max-width:480px){
+  .th-grid{grid-template-columns:repeat(2,1fr)}
+  .podium{grid-template-columns:1fr}
+  .wgrid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- MODAL REGISTRO -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div style="font-size:36px;text-align:center;margin-bottom:.75rem">🇮🇹</div>
+    <h2 class="sf" style="text-align:center">Italiani di<br><em style="color:var(--terra)">Sant'Angelo</em></h2>
+    <p class="modal-sub" style="text-align:center">El desafío mensual para argentinos<br>que aprenden italiano juntos</p>
+    <label>Tu nombre</label>
+    <input type="text" id="reg-nombre" placeholder="Ej: Gastón Rodríguez" autocomplete="name">
+    <label>Nivel</label>
+    <select id="reg-nivel">
+      <option value="Básico">Básico — recién empiezo</option>
+      <option value="Intermedio">Intermedio — sé algunas cosas</option>
+      <option value="Avanzado">Avanzado — quiero perfeccionarme</option>
+    </select>
+    <button class="btn-reg" onclick="registrar()">Entrar al desafío →</button>
+    <button class="btn-skip" onclick="saltar()">Solo quiero ver la app primero</button>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <span class="topbar-brand sf">Italiani di <em>Sant'Angelo</em></span>
+  <div class="topbar-right">
+    <span class="pts-badge" id="top-pts">0 pts</span>
+    <div class="av" id="top-av" title="Cambiar usuario" onclick="document.getElementById('modalBg').classList.remove('hidden')">?</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nb on" onclick="goTab('aprender',this)">📖 Aprender</button>
+  <button class="nb" onclick="goTab('palabras',this)">🔤 Palabras</button>
+  <button class="nb" onclick="goTab('ejercicios',this)">✏️ Ejercicios</button>
+  <button class="nb" onclick="goTab('pronunciacion',this)">🎤 Pronunciación</button>
+  <button class="nb" onclick="goTab('tablero',this)">🏆 Tablero</button>
+  <button class="nb" onclick="goTab('desafio',this)">🎯 Desafío</button>
+</nav>
+
+<div class="wrap">
+
+<!-- ========== APRENDER ========== -->
+<div class="page on" id="page-aprender">
+  <div class="pills">
+    <button class="pill on" onclick="setNivel('basico',this)">Básico</button>
+    <button class="pill" onclick="setNivel('intermedio',this)">Intermedio</button>
+    <button class="pill" onclick="setNivel('avanzado',this)">Avanzado</button>
+  </div>
+
+  <div class="card" id="lec-card">
+    <div id="lec-title" class="ctitle sf"></div>
+    <div id="lec-sub" class="csub"></div>
+    <div class="lec-prog">
+      <span id="lec-prog-txt">Lección 1 de 3</span>
+      <div class="lec-prog-bar"><div class="lec-prog-fill" id="lec-prog-fill" style="width:33%"></div></div>
+    </div>
+    <div id="lec-rules"></div>
+    <div style="margin-top:1.25rem;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="bai" onclick="practicarLeccion()">
+        <span class="spin" id="sp-lec"></span>✨ Practicar con IA
+      </button>
+      <button class="bs" onclick="sigLeccion()">Siguiente lección →</button>
+    </div>
+    <div class="aibox" id="ai-lec"></div>
+  </div>
+
+  <!-- LECCIONES EXTRA (todas visibles en lista) -->
+  <div id="lec-extra"></div>
+</div>
+
+<!-- ========== PALABRAS ========== -->
+<div class="page" id="page-palabras">
+  <div class="trow" id="trow"></div>
+  <div class="wgrid" id="wgrid"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem">
+    <button class="bai" onclick="maspalabras()"><span class="spin" id="sp-pal"></span>✨ Más palabras con IA</button>
+  </div>
+  <div class="aibox" id="ai-pal"></div>
+
+  <!-- Palabras aprendidas -->
+  <div class="card">
+    <div class="ctitle sf">Palabras aprendidas</div>
+    <div class="csub">Hacé click en una palabra para marcarla como aprendida (+5 pts)</div>
+    <div id="learned-count" style="font-size:14px;color:var(--terra);font-weight:500;margin-bottom:.5rem">0 palabras aprendidas este mes</div>
+  </div>
+</div>
+
+<!-- ========== EJERCICIOS ========== -->
+<div class="page" id="page-ejercicios">
+  <div class="card" style="padding:1rem 1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <div>
+        <div class="ctitle sf" style="font-size:15px">Tu racha</div>
+        <div id="racha-lbl" style="font-size:12px;color:var(--ink2);opacity:.65">Practicá cada día para mantenerla</div>
+      </div>
+      <div style="font-size:26px;font-weight:700;color:var(--terra)" id="racha-num">0🔥</div>
+    </div>
+    <div class="racha-strip" id="racha-strip"></div>
+  </div>
+
+  <div class="card" id="ej-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.25rem">
+      <span class="ej-tipo" id="ej-tipo"></span>
+      <span class="ej-pts" id="ej-pts"></span>
+    </div>
+    <div class="ej-q" id="ej-q"></div>
+    <div id="ej-input-area"></div>
+    <div class="fb" id="ej-fb"></div>
+    <div class="brow" id="ej-brow"></div>
+    <div class="aibox" id="ai-ej"></div>
+  </div>
+
+  <!-- TODOS LOS EJERCICIOS LIST -->
+  <div class="card">
+    <div class="ctitle sf">Banco de ejercicios</div>
+    <div class="csub">Todos los ejercicios disponibles · hacé click para practicar uno</div>
+    <div id="ej-bank"></div>
+  </div>
+</div>
+
+<!-- ========== PRONUNCIACIÓN ========== -->
+<div class="page" id="page-pronunciacion">
+  <div class="card">
+    <div class="ctitle sf">Reglas de pronunciación italiana</div>
+    <div class="csub">Lo que más cuesta a los argentinos · con ejemplos prácticos</div>
+    <div id="pron-rules"></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle sf">Practicar una palabra</div>
+    <div class="csub">Escribí cualquier palabra italiana y la IA te explica cómo pronunciarla</div>
+    <input class="fi" type="text" id="pron-input" placeholder="Ej: buongiorno, grazie, figlio, chiesa...">
+    <button class="bai" onclick="practicarPron()"><span class="spin" id="sp-pron"></span>✨ Explicar pronunciación</button>
+    <div class="aibox" id="ai-pron"></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle sf">Frases difíciles para argentinos</div>
+    <div class="csub">Practicá estas frases complejas — hacé click para que la IA te ayude</div>
+    <div id="hard-phrases"></div>
+  </div>
+</div>
+
+<!-- ========== TABLERO ========== -->
+<div class="page" id="page-tablero">
+  <div class="th-grid">
+    <div class="thcard"><div class="th-lbl">JUGADORES</div><div class="th-val sf" id="st-jug">—</div></div>
+    <div class="thcard"><div class="th-lbl">TU POSICIÓN</div><div class="th-val sf" id="st-pos">—</div></div>
+    <div class="thcard"><div class="th-lbl">DÍAS RESTANTES</div><div class="th-val sf" id="st-dias">—</div></div>
+  </div>
+  <div class="podium" id="podium"></div>
+  <div class="card">
+    <div class="csub" style="margin-bottom:.75rem">Clasificación completa — <span id="mes-label"></span></div>
+    <div id="player-list"></div>
+  </div>
+</div>
+
+<!-- ========== DESAFÍO ========== -->
+<div class="page" id="page-desafio">
+  <div class="dhero">
+    <div class="dhero-title" id="dh-title">Desafío</div>
+    <div class="dhero-sub">¡El que más aprende se lleva el premio!</div>
+    <div class="dhero-num" id="dh-dias">—</div>
+    <div class="dhero-lbl">días restantes en el desafío</div>
+    <div class="tbar"><div class="tfill" id="tfill" style="width:0%"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle sf" style="margin-bottom:1rem">¿Cómo ganar puntos?</div>
+    <table class="pts-tbl">
+      <thead><tr><th>Actividad</th><th style="text-align:right">Puntos</th></tr></thead>
+      <tbody>
+        <tr><td>Completar ejercicio de traducción</td><td class="pts-v">+15</td></tr>
+        <tr><td>Completar ejercicio de gramática</td><td class="pts-v">+20</td></tr>
+        <tr><td>Ejercicio de completar oraciones</td><td class="pts-v">+20</td></tr>
+        <tr><td>Escritura libre corregida por IA</td><td class="pts-v">+25</td></tr>
+        <tr><td>Practicar lección con IA</td><td class="pts-v">+20</td></tr>
+        <tr><td>Pronunciación practicada con IA</td><td class="pts-v">+10</td></tr>
+        <tr><td>Palabra marcada como aprendida</td><td class="pts-v">+5</td></tr>
+        <tr><td>Racha diaria (por cada día)</td><td class="pts-v">+5</td></tr>
+        <tr><td>Bonus racha de 7 días</td><td class="pts-v">+50</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="ctitle sf" style="margin-bottom:1rem">Reglas del grupo</div>
+    <div class="ritem"><div class="rico">🎯</div><div><div class="rtitle">Un ejercicio por tipo, por día</div><div class="rdesc">Cada categoría de ejercicio suma puntos una sola vez al día para que sea justo para todos.</div></div></div>
+    <div class="ritem"><div class="rico">🤖</div><div><div class="rtitle">La IA corrige escritura libre</div><div class="rdesc">Los ejercicios de escritura se mandan a la IA para una corrección imparcial y automática.</div></div></div>
+    <div class="ritem"><div class="rico">🔥</div><div><div class="rtitle">La racha se corta en 48 horas</div><div class="rdesc">Si no entrás en 2 días tu racha vuelve a cero. ¡A no flojear che!</div></div></div>
+    <div class="ritem"><div class="rico">📱</div><div><div class="rtitle">Compartir el link por WhatsApp</div><div class="rdesc">Todos entran con el mismo link. Cada uno se registra con su nombre y el tablero es compartido.</div></div></div>
+    <div class="ritem"><div class="rico">🏆</div><div><div class="rtitle">El ganador elige el premio</div><div class="rdesc">Al final del mes, el primero del tablero decide el premio con el grupo (cena, vino, etc).</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle sf" style="margin-bottom:.75rem">Escribir en grupo</div>
+    <div class="csub">Practicá italiano escribiendo sobre tu día en Sant'Angelo</div>
+    <textarea class="fi" id="escritura-libre" rows="4" placeholder="Oggi ho fatto... (Hoy hice...) — Escribí lo que quieras en italiano, aunque sea mezclado con español"></textarea>
+    <button class="bai" onclick="corregirEscritura()"><span class="spin" id="sp-esc"></span>✨ Corregir mi italiano</button>
+    <div class="aibox" id="ai-esc"></div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DATOS LECCIONES ============
+const LECCIONES = [
+  {
+    nivel:'basico', num:1,
+    titulo:'Saludos y presentaciones',
+    sub:'Las primeras palabras que necesitás vivir en Italia',
+    reglas:[
+      {t:'Saludos básicos',items:[['Ciao','Hola / Chau (informal)'],['Buongiorno','Buenos días'],['Buonasera','Buenas tardes / noches'],['Buonanotte','Buenas noches (al dormir)'],['Arrivederci','Hasta luego (formal)'],['A presto','Hasta pronto']]},
+      {t:'Presentarse',items:[['Mi chiamo...','Me llamo...'],['Sono argentino/a','Soy argentino/a'],['Vengo dall\'Argentina','Vengo de Argentina'],['Abito a Sant\'Angelo','Vivo en Sant\'Angelo'],['Piacere di conoscerti','Mucho gusto de conocerte'],['Di dove sei?','¿De dónde sos?']]},
+      {t:'Cortesías esenciales',items:[['Grazie','Gracias'],['Grazie mille','Muchísimas gracias'],['Prego','De nada'],['Scusa / Scusi','Perdón (informal/formal)'],['Per favore','Por favor'],['Non capisco','No entiendo'],['Puoi ripetere?','¿Podés repetir?']]},
+    ]
+  },
+  {
+    nivel:'basico', num:2,
+    titulo:'Números, días y tiempo',
+    sub:'Para el mercado, el trabajo y el día a día',
+    reglas:[
+      {t:'Números del 1 al 20',items:[['uno, due, tre','1, 2, 3'],['quattro, cinque, sei','4, 5, 6'],['sette, otto, nove','7, 8, 9'],['dieci','10'],['undici, dodici, tredici','11, 12, 13'],['venti, trenta, cento','20, 30, 100']]},
+      {t:'Días de la semana',items:[['lunedì','lunes'],['martedì','martes'],['mercoledì','miércoles'],['giovedì','jueves'],['venerdì','viernes'],['sabato / domenica','sábado / domingo']]},
+      {t:'Expresiones de tiempo',items:[['Oggi','Hoy'],['Ieri / Domani','Ayer / Mañana'],['La settimana scorsa','La semana pasada'],['Il mese prossimo','El mes que viene'],['Che ore sono?','¿Qué hora es?'],['Sono le tre','Son las tres']]},
+    ]
+  },
+  {
+    nivel:'basico', num:3,
+    titulo:'En el pueblo y las compras',
+    sub:'Vocabulario para moverse en Sant\'Angelo y alrededores',
+    reglas:[
+      {t:'Lugares del pueblo',items:[['il comune','el municipio'],['la chiesa','la iglesia'],['la piazza','la plaza'],['il bar','el bar / café'],['la farmacia','la farmacia'],['il supermercato','el supermercado']]},
+      {t:'En el negocio',items:[['Quanto costa?','¿Cuánto cuesta?'],['Vorrei...','Quisiera... / Me gustaría...'],['Avete...?','¿Tienen...?'],['Un chilo di...','Un kilo de...'],['Il conto, per favore','La cuenta, por favor'],['Troppo caro','Demasiado caro']]},
+      {t:'Pedir ayuda',items:[['Mi può aiutare?','¿Me puede ayudar?'],['Dov\'è...?','¿Dónde está...?'],['Come si va a...?','¿Cómo se va a...?'],['A destra / sinistra','A la derecha / izquierda'],['Sempre dritto','Siempre recto'],['È lontano?','¿Está lejos?']]},
+    ]
+  },
+  {
+    nivel:'intermedio', num:4,
+    titulo:'Essere, Stare y Avere',
+    sub:'Los tres verbos más importantes del italiano',
+    reglas:[
+      {t:'Essere — ser (permanente)',items:[['Sono argentino','Soy argentino'],['Sei brava','Sos hábil/buena'],['È una bella giornata','Es un lindo día'],['Siamo stanchi','Estamos cansados'],['Sono le due','Son las dos']]},
+      {t:'Stare — estar (estado/proceso)',items:[['Come stai?','¿Cómo estás?'],['Sto bene, grazie','Estoy bien, gracias'],['Sta studiando','Está estudiando (gerundio)'],['Stiamo aspettando','Estamos esperando'],['Come sta tua madre?','¿Cómo está tu mamá?']]},
+      {t:'Avere — tener (y sensaciones)',items:[['Ho fame / sete','Tengo hambre / sed'],['Hai freddo?','¿Tenés frío?'],['Ha trent\'anni','Tiene treinta años'],['Abbiamo fretta','Tenemos apuro'],['Ho bisogno di...','Necesito... (lit: tengo necesidad de)']]},
+    ]
+  },
+  {
+    nivel:'intermedio', num:5,
+    titulo:'Passato Prossimo',
+    sub:'El pasado compuesto: contar lo que pasó',
+    reglas:[
+      {t:'Estructura: avere + participio',items:[['Ho mangiato la pasta','Comí pasta'],['Hai chiamato Maria?','¿Llamaste a María?'],['Abbiamo visto un film','Vimos una película'],['Hanno lavorato tutto il giorno','Trabajaron todo el día']]},
+      {t:'Con essere (verbos de movimiento)',items:[['Sono andato al mercato','Fui al mercado'],['Sei arrivata tardi','Llegaste tarde (fem.)'],['Siamo partiti ieri','Nos fuimos ayer'],['È venuto a trovarci','Vino a visitarnos']]},
+      {t:'Participios irregulares clave',items:[['fare → fatto','hacer → hecho'],['essere → stato','ser → sido'],['venire → venuto','venir → venido'],['vedere → visto','ver → visto'],['aprire → aperto','abrir → abierto']]},
+    ]
+  },
+  {
+    nivel:'avanzado', num:6,
+    titulo:'Il Congiuntivo',
+    sub:'El subjuntivo: deseos, dudas y opiniones',
+    reglas:[
+      {t:'Cuándo se usa',items:[['Credo che tu abbia ragione','Creo que tenés razón'],['Voglio che venga','Quiero que venga'],['È possibile che piova','Es posible que llueva'],['Sebbene sia stanco...','Aunque esté cansado...'],['Prima che arrivi...','Antes de que llegue...']]},
+      {t:'Conjugación presente (-are)',items:[['io parli','yo hable'],['tu parli','vos hablés'],['lui/lei parli','él/ella hable'],['noi parliamo','nosotros hablemos'],['voi parliate','ustedes hablen'],['loro parlino','ellos hablen']]},
+      {t:'Irregulares más usados',items:[['essere → sia','ser/estar'],['avere → abbia','tener'],['fare → faccia','hacer'],['sapere → sappia','saber'],['potere → possa','poder'],['volere → voglia','querer']]},
+    ]
+  },
+];
+
+// ============ DATOS PALABRAS ============
+const PALABRAS = {
+  cotidiano:[
+    {it:'casa',es:'casa',pron:'[ˈkaːza]'},{it:'acqua',es:'agua',pron:'[ˈakkwa]'},
+    {it:'lavoro',es:'trabajo',pron:'[laˈvɔːro]'},{it:'strada',es:'calle',pron:'[ˈstraːda]'},
+    {it:'tempo',es:'tiempo / clima',pron:'[ˈtɛmpo]'},{it:'amico',es:'amigo',pron:'[aˈmiːko]'},
+    {it:'giorno',es:'día',pron:'[ˈdʒorno]'},{it:'notte',es:'noche',pron:'[ˈnɔtte]'},
+    {it:'mattina',es:'mañana (hora)',pron:'[matˈtiːna]'},{it:'sera',es:'tarde / noche',pron:'[ˈseːra]'},
+    {it:'famiglia',es:'familia',pron:'[faˈmiʎʎa]'},{it:'figlio',es:'hijo',pron:'[ˈfiʎʎo]'},
+  ],
+  comida:[
+    {it:'pane',es:'pan',pron:'[ˈpaːne]'},{it:'vino',es:'vino',pron:'[ˈviːno]'},
+    {it:'formaggio',es:'queso',pron:'[forˈmaddʒo]'},{it:'pasta',es:'pasta',pron:'[ˈpasta]'},
+    {it:'verdura',es:'verdura',pron:'[verˈduːra]'},{it:'carne',es:'carne',pron:'[ˈkarne]'},
+    {it:'caffè',es:'café',pron:'[kafˈfɛ]'},{it:'pesca',es:'durazno',pron:'[ˈpɛska]'},
+    {it:'peperoncino',es:'ají picante',pron:'[peperonˈtʃiːno]'},{it:'olio',es:'aceite',pron:'[ˈɔːljo]'},
+    {it:'aglio',es:'ajo',pron:'[ˈaʎʎo]'},{it:'pomodoro',es:'tomate',pron:'[pomoˈdɔːro]'},
+  ],
+  ciudad:[
+    {it:'comune',es:'municipio',pron:'[koˈmuːne]'},{it:'chiesa',es:'iglesia',pron:'[ˈkjɛːza]'},
+    {it:'piazza',es:'plaza',pron:'[ˈpjattsa]'},{it:'negozio',es:'tienda',pron:'[neˈɡɔttsjo]'},
+    {it:'farmacia',es:'farmacia',pron:'[farˈmaːtʃa]'},{it:'mercato',es:'mercado',pron:'[merˈkaːto]'},
+    {it:'via',es:'calle / camino',pron:'[ˈviːa]'},{it:'sindaco',es:'intendente',pron:'[ˈsindako]'},
+    {it:'municipio',es:'ayuntamiento',pron:'[muniˈtʃiːpjo]'},{it:'campagna',es:'campo',pron:'[kamˈpaɲɲa]'},
+  ],
+  numeros:[
+    {it:'uno / una',es:'uno / una',pron:'[ˈuːno]'},{it:'due',es:'dos',pron:'[ˈduːe]'},
+    {it:'tre',es:'tres',pron:'[ˈtrɛː]'},{it:'quattro',es:'cuatro',pron:'[ˈkwattro]'},
+    {it:'cinque',es:'cinco',pron:'[ˈtʃiŋkwe]'},{it:'sei',es:'seis',pron:'[ˈsɛːi]'},
+    {it:'sette',es:'siete',pron:'[ˈsɛtte]'},{it:'dieci',es:'diez',pron:'[ˈdjɛːtʃi]'},
+    {it:'venti',es:'veinte',pron:'[ˈvɛnti]'},{it:'cento',es:'cien',pron:'[ˈtʃɛnto]'},
+    {it:'mille',es:'mil',pron:'[ˈmille]'},{it:'primo / prima',es:'primero/a',pron:'[ˈpriːmo]'},
+  ],
+  verbos:[
+    {it:'mangiare',es:'comer',pron:'[manˈdʒaːre]'},{it:'dormire',es:'dormir',pron:'[dorˈmiːre]'},
+    {it:'parlare',es:'hablar',pron:'[parˈlaːre]'},{it:'capire',es:'entender',pron:'[kaˈpiːre]'},
+    {it:'andare',es:'ir',pron:'[anˈdaːre]'},{it:'venire',es:'venir',pron:'[veˈniːre]'},
+    {it:'essere',es:'ser / estar',pron:'[ˈɛssere]'},{it:'avere',es:'tener',pron:'[aˈveːre]'},
+    {it:'fare',es:'hacer',pron:'[ˈfaːre]'},{it:'potere',es:'poder',pron:'[poˈteːre]'},
+    {it:'volere',es:'querer',pron:'[voˈleːre]'},{it:'sapere',es:'saber',pron:'[saˈpeːre]'},
+  ],
+};
+const TEMA_LABELS = {cotidiano:'Cotidiano',comida:'Comida',ciudad:'Ciudad / Pueblo',numeros:'Números',verbos:'Verbos clave'};
+
+// ============ DATOS EJERCICIOS ============
+const EJERCICIOS = [
+  {tipo:'Traducción',q:'¿Cómo le decís "buenos días, ¿cómo estás?" a tu vecino?',resp:'buongiorno come stai',pts:15},
+  {tipo:'Completar',q:'Completá: "Mi ___ Marco, sono ___ Argentina."',resp:'chiamo dall',pts:20},
+  {tipo:'Traducción',q:'Pasá al español: "Il mio vicino è molto gentile"',resp:'vecino amable gentile',pts:20},
+  {tipo:'Gramática',q:'"Sono stanco" — ¿usa essere o avere? ¿Qué significa?',resp:'essere cansado',pts:20},
+  {tipo:'Completar',q:'Para pedir un café decís: "___ un caffè, per favore"',resp:'vorrei',pts:15},
+  {tipo:'Traducción',q:'¿Cómo decís "No entiendo, ¿podés repetir más despacio?"',resp:'capisco ripetere piano lentamente',pts:25},
+  {tipo:'Gramática',q:'"Ho fame" usa avere. ¿Por qué no essere? ¿Qué significa?',resp:'hambre sensación física avere',pts:20},
+  {tipo:'Traducción',q:'Pasá al italiano: "¿Dónde está la plaza del pueblo?"',resp:'dov piazza comune paese',pts:20},
+  {tipo:'Completar',q:'"Siamo ___ ieri dal mercato." (Llegamos ayer del mercado)',resp:'arrivati tornati',pts:25},
+  {tipo:'Traducción',q:'¿Cómo preguntás el precio de algo en el mercado?',resp:'quanto costa',pts:15},
+  {tipo:'Gramática',q:'¿Cuál es la diferencia entre "Ciao" y "Arrivederci"?',resp:'informal formal',pts:15},
+  {tipo:'Completar',q:'"___ vai domani?" (¿A dónde vas mañana?)',resp:'dove',pts:15},
+  {tipo:'Escritura libre',q:'Escribí 3 oraciones describiendo tu día de hoy en Sant\'Angelo (podés mezclar español e italiano)',resp:null,pts:30},
+  {tipo:'Escritura libre',q:'Presentate en italiano: nombre, de dónde sos, cuánto tiempo llevas en el pueblo, qué te gusta de Italia.',resp:null,pts:30},
+  {tipo:'Escritura libre',q:'Describí tu comida favorita italiana usando al menos 5 palabras en italiano.',resp:null,pts:25},
+];
+
+// ============ PRONUNCIACIÓN ============
+const PRON_REGLAS = [
+  {w:'gl → [ʎ]',ph:'como "ll" en "llover" pero más suave',r:'"figlio" = [ˈfiʎʎo] (hijo). "famiglia" = [faˈmiʎʎa] (familia). Similar a "millón" en argentino. Muy común en palabras del sur de Italia.'},
+  {w:'gn → [ɲ]',ph:'exactamente como la "ñ" del español',r:'"bagno" = [ˈbaɲɲo] = baño. "gnocchi" = [ˈɲɔkki] = ñoqui. ¡Esta es fácil para nosotros! La "g" es muda.'},
+  {w:'c + e/i → [tʃ]',ph:'como la "ch" de "chico"',r:'"cena" = [ˈtʃɛːna] (NO "sena"). "cinema" = [ˈtʃiːnema]. "dolce" = [ˈdoltʃe]. La c antes de a/o/u suena como en español.'},
+  {w:'g + e/i → [dʒ]',ph:'como la "y" suave de "yo"',r:'"gelato" = [dʒeˈlaːto]. "giro" = [ˈdʒiːro]. "giorno" = [ˈdʒorno] (día). Ante a/o/u la g suena como en español.'},
+  {w:'sc + e/i → [ʃ]',ph:'como la "sh" inglesa o la "ll" porteña',r:'"scena" = [ˈʃɛːna]. "pesce" = [ˈpeʃʃe] (pescado). "prosciutto" = [proˈʃutto] (jamón crudo).'},
+  {w:'z → [ts] o [dz]',ph:'dos sonidos, según la palabra',r:'"pizza" = [ˈpittsa]. "zero" = [ˈdzɛːro]. "grazie" = [ˈɡrattsje]. Al inicio de palabra suele ser [dz].'},
+  {w:'doppie consonanti',ph:'consonantes dobles: se pronuncian más largas',r:'"notte" (noche) vs "note" (notas). "fatto" vs "fato". La doble cambia el significado. Hay que alargar el sonido, como en "un nene".'},
+  {w:'Gli articoli',ph:'il / la / i / le / lo / gli / un / una',r:'"il" ante masc. singular, "la" ante fem. "Lo" ante s+consonante y z: "lo zio" (el tío), "lo sport". "Gli" es el plural de "lo".'},
+];
+
+const FRASES_DIFICILES = [
+  'Gli occhi di Guglielmo scintillano',
+  'La famiglia Schiavone abita in campagna',
+  'Voglio gli gnocchi con aglio e olio',
+  'Che cosa succede in questo comune?',
+  'Il sindaco ha inaugurato la piazza',
+];
+
+// ============ ESTADO ============
+let usuario = {nombre:'', nivel:'Básico', pts:0, racha:0, ultimaAct:null, diasActivos:[], aprendidas:[], ejHoy:{}};
+let nivelActual = 'basico';
+let leccionIdx = 0;
+let temaActual = 'cotidiano';
+let ejIdx = 0;
+let ejRespondido = false;
+
+// ============ STORAGE ============
+function loadU(n){try{return JSON.parse(localStorage.getItem('ita_u_'+n))||null}catch{return null}}
+function saveU(){if(usuario.nombre)localStorage.setItem('ita_u_'+usuario.nombre,JSON.stringify(usuario))}
+function loadUsers(){try{return JSON.parse(localStorage.getItem('ita_users'))||[]}catch{return[]}}
+function saveUsers(u){localStorage.setItem('ita_users',JSON.stringify(u))}
+
+function registrar(){
+  const n = document.getElementById('reg-nombre').value.trim();
+  const nv = document.getElementById('reg-nivel').value;
+  if(!n){toast('Escribí tu nombre primero');return}
+  let saved = loadU(n);
+  if(saved) usuario = saved;
+  usuario.nombre = n; usuario.nivel = nv;
+  let us = loadUsers(); if(!us.includes(n)) us.push(n); saveUsers(us);
+  saveU();
+  document.getElementById('modalBg').classList.add('hidden');
+  updateTopbar();
+  toast('¡Benvenuto/a '+n+'! 🇮🇹');
+}
+function saltar(){
+  document.getElementById('modalBg').classList.add('hidden');
+  if(!usuario.nombre) usuario.nombre = 'Visitante';
+  updateTopbar();
+}
+function updateTopbar(){
+  document.getElementById('top-pts').textContent = usuario.pts+' pts';
+  const ini = usuario.nombre.split(' ').map(p=>p[0]).join('').substring(0,2).toUpperCase()||'?';
+  document.getElementById('top-av').textContent = ini;
+}
+
+// ============ PUNTOS ============
+function sumarPts(n, motivo){
+  usuario.pts += n; updateTopbar(); saveU();
+  toast('+'+n+' pts · '+motivo+' ✓');
+  if(document.getElementById('page-tablero').classList.contains('on')) renderTablero();
+}
+
+// ============ RACHA ============
+function checkRacha(){
+  const hoy = new Date().toISOString().split('T')[0];
+  if(usuario.ultimaAct && usuario.ultimaAct !== hoy){
+    const ayer = new Date(); ayer.setDate(ayer.getDate()-1);
+    const ayerS = ayer.toISOString().split('T')[0];
+    if(usuario.ultimaAct < ayerS) usuario.racha = 0;
+  }
+  if(!usuario.diasActivos) usuario.diasActivos = [];
+}
+function regAct(){
+  const hoy = new Date().toISOString().split('T')[0];
+  checkRacha();
+  if(usuario.ultimaAct !== hoy){
+    usuario.racha = (usuario.racha||0)+1;
+    usuario.ultimaAct = hoy;
+    if(!usuario.diasActivos.includes(hoy)) usuario.diasActivos.push(hoy);
+    sumarPts(5,'racha diaria');
+    if(usuario.racha===7) sumarPts(50,'¡racha de 7 días!');
+  }
+  saveU(); renderRacha();
+}
+function renderRacha(){
+  checkRacha();
+  document.getElementById('racha-num').textContent = (usuario.racha||0)+'🔥';
+  document.getElementById('racha-lbl').textContent = usuario.racha>=7?'¡Racha legendaria!':usuario.racha>0?'días seguidos':'Empezá hoy tu racha';
+  const hoy = new Date(); const strip = document.getElementById('racha-strip');
+  strip.innerHTML = '';
+  for(let i=6;i>=0;i--){
+    const d=new Date(hoy); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    const done=usuario.diasActivos&&usuario.diasActivos.includes(ds);
+    const isH=i===0;
+    const lbl=['Do','Lu','Ma','Mi','Ju','Vi','Sá'][d.getDay()];
+    const el=document.createElement('div');
+    el.className='rday'+(done?' done':isH?' hoy':'');
+    el.innerHTML=`<span>${done?'✓':lbl}</span><span style="font-size:9px;margin-top:1px">${lbl}</span>`;
+    strip.appendChild(el);
+  }
+}
+
+// ============ APRENDER ============
+function getLecciones(nivel){ return LECCIONES.filter(l=>l.nivel===nivel) }
+function setNivel(n,btn){
+  nivelActual=n; leccionIdx=0;
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderLeccion();
+}
+function sigLeccion(){
+  const lista = getLecciones(nivelActual);
+  leccionIdx = (leccionIdx+1)%lista.length;
+  renderLeccion();
+  sumarPts(20,'lección avanzada');
+}
+function renderLeccion(){
+  const lista = getLecciones(nivelActual);
+  const l = lista[leccionIdx];
+  document.getElementById('lec-title').textContent = 'Lección '+l.num+' · '+l.titulo;
+  document.getElementById('lec-sub').textContent = l.sub;
+  document.getElementById('lec-prog-txt').textContent = 'Lección '+(leccionIdx+1)+' de '+lista.length;
+  document.getElementById('lec-prog-fill').style.width = (((leccionIdx+1)/lista.length)*100)+'%';
+  let html='';
+  l.reglas.forEach(r=>{
+    html+=`<div class="lrule"><div class="lrtitle">${r.t}</div>`;
+    r.items.forEach(([it,es])=>{html+=`<div class="lrrow"><span class="lrit">${it}</span><span class="lres">${es}</span></div>`});
+    html+='</div>';
+  });
+  document.getElementById('lec-rules').innerHTML = html;
+  document.getElementById('ai-lec').className='aibox';
+  document.getElementById('ai-lec').textContent='';
+
+  // Extra: lista todas las lecciones del nivel
+  let extra='';
+  lista.forEach((le,i)=>{
+    if(i!==leccionIdx){
+      extra+=`<div class="card" style="cursor:pointer;opacity:.75" onclick="leccionIdx=${i};renderLeccion()">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="ctitle sf" style="font-size:16px">Lección ${le.num} · ${le.titulo}</div>
+            <div class="csub" style="margin-bottom:0">${le.sub}</div>
+          </div>
+          <span style="font-size:20px">→</span>
+        </div>
+      </div>`;
+    }
+  });
+  document.getElementById('lec-extra').innerHTML = extra;
+}
+async function practicarLeccion(){
+  const l = getLecciones(nivelActual)[leccionIdx];
+  const btn=event.target.closest('button'); const sp=document.getElementById('sp-lec');
+  btn.disabled=true; sp.style.display='block';
+  try{
+    const r=await claude(`Sos un profesor de italiano. El alumno está viendo la lección "${l.titulo}" (nivel ${nivelActual}).
+Hacele 3 ejercicios variados: una traducción, una para completar oraciones, y una pregunta de gramática.
+Al final de cada uno poné la respuesta correcta entre paréntesis.
+Sé conciso, amigable, usá español rioplatense. Sin markdown ni asteriscos.`);
+    const b=document.getElementById('ai-lec'); b.textContent=r; b.className='aibox on';
+    sumarPts(20,'practicó lección con IA'); regAct();
+  }catch(e){toast('Error con la IA');}
+  btn.disabled=false; sp.style.display='none';
+}
+
+// ============ PALABRAS ============
+function renderTemas(){
+  document.getElementById('trow').innerHTML = Object.entries(TEMA_LABELS).map(([k,v])=>
+    `<button class="tbtn${k===temaActual?' on':''}" onclick="setTema('${k}',this)">${v}</button>`
+  ).join('');
+}
+function setTema(t,btn){
+  temaActual=t;
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderGrid();
+}
+const BG=['#EEEDFE','#E1F5EE','#FAECE7','#E6F1FB','#EAF3DE','#FAEEDA','#FBEAF0','#F1EFE8'];
+function renderGrid(){
+  const lista = PALABRAS[temaActual];
+  document.getElementById('wgrid').innerHTML = lista.map((p,i)=>{
+    const apd = usuario.aprendidas&&usuario.aprendidas.includes(temaActual+'_'+p.it);
+    return `<div class="wcard${apd?' learned':''}" style="background:${BG[i%BG.length]}" onclick="aprenderPal('${temaActual}_${p.it}','${p.it}')">
+      <div class="wcheck">✓</div>
+      <div class="wit">${p.it}</div>
+      <div class="wes">${p.es}</div>
+      <div class="wpron">${p.pron}</div>
+      ${!apd?'<div style="margin-top:6px;font-size:11px;color:var(--gold);font-weight:500">+5 pts</div>':''}
+    </div>`;
+  }).join('');
+  const cnt = (usuario.aprendidas||[]).length;
+  document.getElementById('learned-count').textContent = cnt+' palabras aprendidas este mes';
+}
+function aprenderPal(key,it){
+  if(!usuario.aprendidas) usuario.aprendidas=[];
+  if(!usuario.aprendidas.includes(key)){
+    usuario.aprendidas.push(key); sumarPts(5,'"'+it+'" aprendida'); regAct();
+    renderGrid();
+    const cnt=(usuario.aprendidas||[]).length;
+    document.getElementById('learned-count').textContent=cnt+' palabras aprendidas este mes';
+  }
+}
+async function maspalabras(){
+  const btn=event.target.closest('button'); const sp=document.getElementById('sp-pal');
+  btn.disabled=true; sp.style.display='block';
+  try{
+    const r=await claude(`Dame 6 palabras nuevas de italiano del tema "${TEMA_LABELS[temaActual]}" útiles para vivir en un pueblo pequeño del sur de Italia como Sant'Angelo le Fratte (Basilicata).
+Para cada una: palabra italiana · traducción española · pronunciación fonética simple · ejemplo de uso en una oración corta.
+Formato claro, sin markdown. En español rioplatense.`);
+    const b=document.getElementById('ai-pal'); b.textContent=r; b.className='aibox on';
+  }catch(e){toast('Error con la IA');}
+  btn.disabled=false; sp.style.display='none';
+}
+
+// ============ EJERCICIOS ============
+function renderEjBanco(){
+  document.getElementById('ej-bank').innerHTML = EJERCICIOS.map((ej,i)=>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer;font-size:14px" onclick="ejIdx=${i};renderEj()">
+      <div>
+        <span style="font-size:11px;font-weight:500;color:var(--terra);text-transform:uppercase;letter-spacing:.5px;margin-right:8px">${ej.tipo}</span>
+        <span>${ej.q.substring(0,55)}${ej.q.length>55?'...':''}</span>
+      </div>
+      <span style="font-size:13px;color:var(--gold);font-weight:500;flex-shrink:0;margin-left:8px">+${ej.pts}</span>
+    </div>`
+  ).join('');
+}
+function renderEj(){
+  renderRacha();
+  const ej = EJERCICIOS[ejIdx%EJERCICIOS.length];
+  ejRespondido = false;
+  document.getElementById('ej-tipo').textContent = ej.tipo;
+  document.getElementById('ej-pts').textContent = '+'+ej.pts+' pts';
+  document.getElementById('ej-q').textContent = ej.q;
+  document.getElementById('ej-fb').className='fb';
+  document.getElementById('ai-ej').className='aibox';
+  const libre = !ej.resp;
+  document.getElementById('ej-input-area').innerHTML = libre
+    ? `<textarea class="fi" id="ej-r" rows="4" placeholder="Escribí tu respuesta en italiano..."></textarea>`
+    : `<input class="fi" type="text" id="ej-r" placeholder="Tu respuesta en italiano..." onkeydown="if(event.key==='Enter')verificar()">`;
+  document.getElementById('ej-brow').innerHTML = libre
+    ? `<button class="bai" onclick="corregirLibre()"><span class="spin" id="sp-ej"></span>✨ Corregir con IA</button><button class="bs" onclick="ejIdx++;renderEj()">Otro ejercicio →</button>`
+    : `<button class="bp" onclick="verificar()">Verificar respuesta</button><button class="bs" onclick="ejIdx++;renderEj()">Saltar →</button>`;
+}
+function verificar(){
+  if(ejRespondido) return;
+  const ej=EJERCICIOS[ejIdx%EJERCICIOS.length];
+  const input=(document.getElementById('ej-r').value||'').toLowerCase().trim();
+  const claves=ej.resp.split(' ');
+  const ok=claves.filter(c=>input.includes(c)).length>=Math.ceil(claves.length*.5);
+  const fb=document.getElementById('ej-fb');
+  if(ok){
+    fb.className='fb ok'; fb.textContent='✓ Ottimo! Respuesta correcta. +'+ej.pts+' puntos.';
+    sumarPts(ej.pts,ej.tipo); regAct(); ejRespondido=true;
+    setTimeout(()=>{ejIdx++;renderEj();},2200);
+  } else {
+    fb.className='fb mal'; fb.textContent='Mmm, no del todo. Intentá de nuevo o pedile ayuda a la IA.';
+    document.getElementById('ej-brow').innerHTML+=`<button class="bai" style="margin-top:8px" onclick="ayuda()"><span class="spin" id="sp-ay"></span>✨ Pedir ayuda</button>`;
+  }
+}
+async function ayuda(){
+  const ej=EJERCICIOS[ejIdx%EJERCICIOS.length];
+  const input=(document.getElementById('ej-r')||{}).value||'';
+  const btn=event.target.closest('button'); btn.disabled=true;
+  try{
+    const r=await claude(`Soy estudiante de italiano. Me equivoqué en este ejercicio.
+Pregunta: "${ej.q}"
+Mi respuesta: "${input}"
+Explicame brevemente por qué está mal y cuál es la respuesta correcta.
+Amable, conciso, español rioplatense. Sin markdown.`);
+    const b=document.getElementById('ai-ej'); b.textContent=r; b.className='aibox on';
+  }catch(e){toast('Error IA');}
+  btn.disabled=false;
+}
+async function corregirLibre(){
+  const txt=(document.getElementById('ej-r').value||'').trim();
+  if(!txt){toast('Escribí algo primero');return;}
+  const btn=event.target.closest('button'); const sp=document.getElementById('sp-ej');
+  btn.disabled=true; sp.style.display='block';
+  try{
+    const r=await claude(`Sos un profesor de italiano. Corregí este texto de un estudiante argentino principiante.
+Texto: "${txt}"
+Dame: 1) Los errores con corrección breve. 2) Versión corregida. 3) Puntaje del 0 al 30 con justificación.
+Amable, motivador, conciso. Sin markdown ni asteriscos.`);
+    const b=document.getElementById('ai-ej'); b.textContent=r; b.className='aibox on';
+    sumarPts(25,'escritura corregida'); regAct();
+  }catch(e){toast('Error IA');}
+  btn.disabled=false; sp.style.display='none';
+}
+
+// ============ PRONUNCIACIÓN ============
+function renderPron(){
+  document.getElementById('pron-rules').innerHTML = PRON_REGLAS.map(r=>`
+    <div class="prcard">
+      <div class="prword sf">${r.w}</div>
+      <div class="prphon">${r.ph}</div>
+      <div class="prrule">${r.r}</div>
+    </div>`).join('');
+  document.getElementById('hard-phrases').innerHTML = FRASES_DIFICILES.map(f=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b)">
+      <span style="font-size:14px;font-style:italic">${f}</span>
+      <button class="bai" style="font-size:12px;padding:6px 12px" onclick="pronFrase('${f}')">✨ Cómo decirlo</button>
+    </div>`).join('');
+}
+async function practicarPron(){
+  const p=(document.getElementById('pron-input').value||'').trim();
+  if(!p){toast('Escribí una palabra');return;}
+  const btn=event.target.closest('button'); const sp=document.getElementById('sp-pron');
+  btn.disabled=true; sp.style.display='block';
+  try{
+    const r=await claude(`Sos un profesor de fonética italiana. Explicá cómo pronunciar "${p}".
+Incluí: 1) Transcripción IPA. 2) Cómo explicárselo a un argentino (comparando con sonidos conocidos). 3) Un truco mnemónico. 4) Ejemplo en una oración corta.
+Conciso y práctico. Sin markdown.`);
+    const b=document.getElementById('ai-pron'); b.textContent=r; b.className='aibox on';
+    sumarPts(10,'pronunciación practicada'); regAct();
+  }catch(e){toast('Error IA');}
+  btn.disabled=false; sp.style.display='none';
+}
+async function pronFrase(f){
+  document.getElementById('pron-input').value=f;
+  await practicarPron();
+}
+
+// ============ TABLERO ============
+const AV_COLORS=[['#EEEDFE','#3C3489'],['#E1F5EE','#085041'],['#FAECE7','#712B13'],['#E6F1FB','#0C447C'],['#EAF3DE','#27500A'],['#FAEEDA','#633806'],['#FBEAF0','#4B1528']];
+function renderTablero(){
+  const us=loadUsers();
+  let jug=us.map(n=>{const d=loadU(n)||{nombre:n,nivel:'Básico',pts:0};return d}).sort((a,b)=>b.pts-a.pts);
+  if(jug.length<3){
+    const demo=[{nombre:'Gastón R.',nivel:'Intermedio',pts:410},{nombre:'Valeria M.',nivel:'Avanzado',pts:385},{nombre:'Diego F.',nivel:'Básico',pts:290},{nombre:'Lucía P.',nivel:'Intermedio',pts:240},{nombre:'Martín C.',nivel:'Básico',pts:180}];
+    const existentes=jug.map(j=>j.nombre);
+    demo.forEach(d=>{if(!existentes.includes(d.nombre))jug.push(d)});
+    jug.sort((a,b)=>b.pts-a.pts);
+  }
+  document.getElementById('st-jug').textContent=jug.length;
+  const miPos=jug.findIndex(j=>j.nombre===usuario.nombre);
+  document.getElementById('st-pos').textContent=miPos>=0?'#'+(miPos+1):'—';
+  const hoy=new Date(); const fin=new Date(hoy.getFullYear(),hoy.getMonth()+1,0);
+  const dias=fin.getDate()-hoy.getDate();
+  document.getElementById('st-dias').textContent=dias;
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('mes-label').textContent=meses[hoy.getMonth()]+' '+hoy.getFullYear();
+
+  const top3=jug.slice(0,3);
+  const meds=['🥇','🥈','🥉']; const pcls=['g1','','g3'];
+  document.getElementById('podium').innerHTML=top3.map((j,i)=>`
+    <div class="pod ${pcls[i]}">
+      <div class="pod-med">${meds[i]}</div>
+      <div class="pod-name">${j.nombre}${j.nombre===usuario.nombre?'<span class="mebadge">Vos</span>':''}</div>
+      <div class="pod-pts">${j.pts} pts</div>
+    </div>`).join('');
+
+  const max=jug[0]?.pts||1;
+  document.getElementById('player-list').innerHTML=jug.map((j,i)=>{
+    const [bg,fg]=AV_COLORS[i%AV_COLORS.length];
+    const pct=Math.round((j.pts/max)*100);
+    const ini=j.nombre.split(' ').map(p=>p[0]).join('').substring(0,2).toUpperCase();
+    return `<div class="prow">
+      <div class="ppos">${i+1}</div>
+      <div class="pav" style="background:${bg};color:${fg}">${ini}</div>
+      <div class="pinfo">
+        <div class="pname">${j.nombre}${j.nombre===usuario.nombre?'<span class="mebadge">Vos</span>':''}</div>
+        <div class="plvl">${j.nivel||'Básico'}</div>
+        <div class="pbar-o"><div class="pbar-i" style="width:${pct}%"></div></div>
+      </div>
+      <div class="pscore">${j.pts}<small>puntos</small></div>
+    </div>`;
+  }).join('');
+}
+
+// ============ DESAFÍO ============
+function renderDesafio(){
+  const hoy=new Date(); const fin=new Date(hoy.getFullYear(),hoy.getMonth()+1,0);
+  const dias=fin.getDate()-hoy.getDate();
+  const pct=Math.round((hoy.getDate()/fin.getDate())*100);
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('dh-title').textContent='Desafío '+meses[hoy.getMonth()]+' '+hoy.getFullYear();
+  document.getElementById('dh-dias').textContent=dias;
+  document.getElementById('tfill').style.width=(100-pct)+'%';
+}
+async function corregirEscritura(){
+  const txt=(document.getElementById('escritura-libre').value||'').trim();
+  if(!txt){toast('Escribí algo primero');return;}
+  const btn=event.target.closest('button'); const sp=document.getElementById('sp-esc');
+  btn.disabled=true; sp.style.display='block';
+  try{
+    const r=await claude(`Sos un profesor de italiano simpático. Corregí este texto escrito por un argentino que vive en Sant'Angelo le Fratte.
+Texto: "${txt}"
+Dame: 1) Correcciones principales (3 como máximo, las más importantes). 2) Versión mejorada. 3) Elogio sincero de algo que hizo bien.
+Amable, motivador, conciso. Sin markdown.`);
+    const b=document.getElementById('ai-esc'); b.textContent=r; b.className='aibox on';
+    sumarPts(25,'escritura libre corregida'); regAct();
+  }catch(e){toast('Error IA');}
+  btn.disabled=false; sp.style.display='none';
+}
+
+// ============ NAV ============
+function goTab(sec,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('page-'+sec).classList.add('on');
+  btn.classList.add('on');
+  if(sec==='tablero') renderTablero();
+  if(sec==='ejercicios') renderRacha();
+}
+
+// ============ CLAUDE API ============
+async function claude(prompt){
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system:'Sos un profesor de italiano simpático y paciente. Tus alumnos son argentinos que viven en Sant\'Angelo le Fratte, un pequeño pueblo en Basilicata, Italia. Usás español rioplatense informal (vos, che). Respondé siempre en texto plano sin markdown, sin asteriscos, sin almohadillas.',
+      messages:[{role:'user',content:prompt}]
+    })
+  });
+  const d=await res.json();
+  if(d.error) throw new Error(d.error.message);
+  return d.content?.map(c=>c.text||'').join('')||'Sin respuesta';
+}
+
+// ============ TOAST ============
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.classList.add('on'); clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('on'),2800);
+}
+
+// ============ INIT ============
+function init(){
+  renderLeccion();
+  renderTemas(); renderGrid();
+  renderEj(); renderEjBanco();
+  renderPron();
+  renderTablero();
+  renderDesafio();
+  checkRacha();
+  updateTopbar();
+}
+init();
+</script>
+</body>
+</html>
